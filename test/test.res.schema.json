@@ -1,35 +1,52 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
     "type": "object",
     "title": "The Root Schema",
     "required": [
         "status",
-        "data"
+        "data",
+        "msg"
     ],
     "properties": {
         "status": {
             "$id": "#/properties/status",
             "type": "integer",
-            "title": "The Status Schema"
+            "title": "The Status Schema",
+            "default": 0,
+            "examples": [
+                0
+            ]
         },
         "data": {
             "$id": "#/properties/data",
             "type": "object",
             "title": "The Data Schema",
+            "required": [
+                "hello"
+            ],
             "properties": {
                 "hello": {
                     "$id": "#/properties/data/properties/hello",
                     "type": "string",
-                    "title": "The Hello Schema"
+                    "title": "The Hello Schema",
+                    "default": "",
+                    "examples": [
+                        "world"
+                    ],
+                    "pattern": "^(.*)$"
                 }
             }
         },
         "msg": {
             "$id": "#/properties/msg",
             "type": "string",
-            "title": "The Msg Schema"
+            "title": "The Msg Schema",
+            "default": "",
+            "examples": [
+                "success"
+            ],
+            "pattern": "^(.*)$"
         }
     }
 }

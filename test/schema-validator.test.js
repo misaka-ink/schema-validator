@@ -5,19 +5,28 @@
 
 import Koa from 'koa'
 import validator from '../lib/index'
-import fetch2 from '@misaka.ink/fetch2'
-import testSchema from './test.schema';
+import fetch2, {Error} from '@misaka.ink/fetch2'
+import testReqSchema from './test.req.schema'
+import testResSchema from './test.res.schema'
 
 // fetch2
 const f2 = fetch2.getInstance()
 
-// test data
-const testData = {
+// test res data
+const testRes = {
     status: 0,
     data: {
         hello: 'world'
     },
     msg: 'success'
+}
+
+// error res data
+const errorRes = {
+    status: 1,
+    data: {
+        bye: 'bye'
+    }
 }
 
 // mock server
@@ -30,7 +39,16 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async ctx => {
-    ctx.body = testData
+    if (ctx.request.path.indexOf('/req') > -1) {
+        ctx.body = testRes
+    }
+    else if (ctx.request.path.indexOf('/res') > -1) {
+        ctx.body = testRes
+    }
+    else if (ctx.request.path.indexOf('/error') > -1) {
+        ctx.body = errorRes
+    }
+    else ctx.body = 400
 })
 
 let server
@@ -49,25 +67,47 @@ afterAll(async done => {
 
 const schema = [
     {
-        url: '/test',
-        resSchema: testSchema
+        target: '/req',
+        reqSchema: testReqSchema
+    },
+    {
+        target: '/res',
+        resSchema: testResSchema
+    },
+    {
+        target: '/error',
+        resSchema: testResSchema
     }
 ]
 
 f2.use(validator(schema))
 
 describe('use fetch2 schema-validator middelware', function () {
-    test('Verification passed', async function () {
+    test('response schema verification should passed', async function () {
         try {
-            const result = await f2.request('http://localhost:3000/test')
-            console.log(result)
-            // return expect(result).toEqual('<h1>Hello Mine, here is user template</h1>')
+            const result = await f2.request('http://localhost:3000/res')
+            return expect(result.data.hello).toEqual('world')
         } catch (e) {
             throw e
         }
     })
 
-    test('Verification failed', function () {
+    test('response schema verification should not pass', async function () {
+        try {
+            const result = await f2.request('http://localhost:3000/error')
+        } catch (e) {
+            expect(e.name).toEqual('FetchError')
+        }
+    })
 
+    test('request schema verification should passed', async function() {
+        try {
+            const result = await f2.request('http://localhost:3000/req', {
+                id: 1
+            })
+            return expect(result.data.hello).toEqual('world')
+        } catch (e) {
+            throw e
+        }
     })
 })
