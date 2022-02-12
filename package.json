@@ -23,7 +23,7 @@
     "homepage": "https://github.com/misaka-ink/schema-validator#readme",
     "dependencies": {
         "@misaka.ink/fetch2": "^1.3.4",
-        "ajv": "^6.10.2"
+        "ajv": "^6.12.3"
     },
     "publishConfig": {
         "access": "public"
